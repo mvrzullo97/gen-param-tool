@@ -6,17 +6,17 @@
 # usage menu
 echo
 echo "---------------------- Usage ----------------------"
-echo -e "\n   bash $0\n\n    -n <number of iterations> \n -t <plate_pattern (ex. AB)> \n"
+echo -e "\n   bash $0\n\n    -n <number of iterations> \n    -p <plate_pattern (only two first chars, ex. AB)> \n"
 echo
 
 
 # functions
 function generate_PAN 
 {
-    prg=$1
+    PRG=$1
     pad_NUM="0"
     pad_F="F"
-    pad_PRG_F=$1$pad_F
+    pad_PRG_F=$PRG$pad_F
     len_PAN=19
     str=$timestamp
     offset=$(expr $len_PAN - ${#pad_PRG_F})
@@ -31,11 +31,28 @@ function generate_PAN
     echo ${str}
 }
 
+function generate_TARGA 
+{
+    PRG=$1
+    PLATE=$2
+    pad_NUM="0"
+    len_PLATE=7
+    offset=$(expr $len_PLATE - ${#PLATE} - ${#PRG})
+    while [ ${#PLATE} != $offset ] 
+    do
+        PLATE=$PLATE$pad_NUM
+    done
 
-while getopts n: flag
+    PLATE=$PLATE$PRG$plate
+    echo ${PLATE}
+}
+
+
+while getopts n:p: flag
 do
     	case "${flag}" in
 		n) n=${OPTARG};;
+        p) plate=${OPTARG};;
 		\?) echo -e "\nArgument error! \n"; exit 0 ;;
 	esac
 done
@@ -50,11 +67,16 @@ list_PRG=( $(seq $MIN $MAX) )
 echo " ----- Generazione PAN ----- "
 echo
 
+
 for ((i=0; i<n; i++)) 
 do
-    
-PAN=$(generate_PAN ${list_PRG[i]})
+
+PRG=${list_PRG[i]}
+
+PAN=$(generate_PAN $PRG)
 echo "PAN $i = $PAN"
 
+TARGA=$(generate_TARGA $PRG $plate)
+echo "TARGA $i = $TARGA"
 
 done
