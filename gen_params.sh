@@ -47,6 +47,15 @@ function generate_TARGA
     echo ${PLATE}
 }
 
+function convert_TARGA_to_HEX 
+{
+    plate=$1
+    pad_plate="07"
+    hex_plate="$(printf '%s' "$plate" | xxd -p -u)"
+    hex_plate=$pad_plate$hex_plate
+    echo ${hex_plate}
+}
+
 
 while getopts n:p: flag
 do
@@ -64,19 +73,22 @@ MAX=$(expr $MIN + $n - 1)
 
 list_PRG=( $(seq $MIN $MAX) )
 
-echo " ----- Generazione PAN ----- "
-echo
-
-
 for ((i=0; i<n; i++)) 
 do
+
+echo "coppia PAN/TARGA n° $i"
+echo
 
 PRG=${list_PRG[i]}
 
 PAN=$(generate_PAN $PRG)
-echo "PAN $i = $PAN"
+echo $PAN
 
 TARGA=$(generate_TARGA $PRG $plate)
-echo "TARGA $i = $TARGA"
+echo $TARGA
+
+HEX_TARGA=$(convert_TARGA_to_HEX $TARGA)
+echo $HEX_TARGA
+echo
 
 done
