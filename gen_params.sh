@@ -16,7 +16,7 @@ function generate_PAN
     pad_F="F"
     pad_PRG_F=$PRG$pad_F
     len_PAN=19
-    str=$timestamp
+    str=$current_timestamp
     offset=$(expr $len_PAN - ${#pad_PRG_F})
 
     while [ ${#str} != $offset ] 
@@ -25,7 +25,6 @@ function generate_PAN
     done
     
     str=$str$pad_NUM$pad_PRG_F
-
     echo ${str}
 }
 
@@ -62,7 +61,7 @@ do
 		n) n=${OPTARG};;
         f) plate_f=${OPTARG};;
         l) plate_l=${OPTARG};;
-		\?) echo -e "\nArgument error! \n"; exit 0 ;;
+		\?) echo -e "\n Argument error! \n"; exit 0 ;;
 	esac
 done
 
@@ -80,20 +79,20 @@ fi
 # check plate's length
 if [[ ${#plate_f} != 2 ]]; 
 then
-        echo -e "Param error: invalid plate format (only two first chars, ex. AB) \n"
-        echo
+    echo -e "Param error: invalid plate format (only two first chars, ex. AB) \n"
+    echo
 	exit 0
 fi
 
 if [[ ${#plate_l} != 2 ]]; 
 then
-        echo -e "Param error: invalid plate format (only two first chars, ex. AB) \n"
-        echo
+    echo -e "Param error: invalid plate format (only two first chars, ex. AB) \n"
+    echo
 	exit 0
 fi
 
 # vars delcaration
-timestamp=$(date +"%Y%m%d")
+current_timestamp=$(date +"%Y%m%d")
 OUT_DIR="OUT_DIR"
 params_gen_FILE="params_gen.xml"
 
@@ -109,23 +108,28 @@ fi
 
 # get LAST_PRG_USED
 if ! [ -f "$path_OUT_dir/$params_gen_FILE" ] ; then
-
         touch "$path_OUT_dir/$params_gen_FILE"
         chmod 0777 "$path_OUT_dir/$params_gen_FILE"
         last_PRG_value=0 #if it's the first run
-
-	else
+	else  
+        # get and clean old timestamp from file
+        old_timestamp_line="$(grep 'SCRIPT_EXECUTION_TIME:' "$path_OUT_dir/$params_gen_FILE")"
+        old_timestamp_value=${old_timestamp_line#*:}
+        old_timestamp_value="${old_timestamp_value: 1:10}"
+        old_timestamp_value="${old_timestamp_value//-}"
         
-        # get LAST PRG USED before tabula rasa
-        line_last_PRG="$(grep 'LAST_PRG_USED:' "$path_OUT_dir/$params_gen_FILE")"
-        last_PRG_value=${line_last_PRG#*:}
-        echo -e "file '$params_gen_FILE' found, the last prg used is $last_PRG_value \n"
-
+        if [ $old_timestamp_value == $current_timestamp ] ; then
+            # get LAST PRG USED before tabula rasa
+            line_last_PRG="$(grep 'LAST_PRG_USED:' "$path_OUT_dir/$params_gen_FILE")"
+            last_PRG_value=${line_last_PRG#*:}
+            echo -e "file '$params_gen_FILE' found, the last prg used is $last_PRG_value \n"
+        else
+            last_PRG_value=0
+        fi 
 	fi
 
-# tabula rasa of params_generated.xml
+# tabula rasa of params_gen.xml
 echo > "$path_OUT_dir/$params_gen_FILE"
-
 
 MIN=$(expr $last_PRG_value + 1)
 MAX=$(expr $MIN + $n - 1)
