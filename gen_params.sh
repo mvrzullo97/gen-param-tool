@@ -97,9 +97,6 @@ fi
 
 # vars delcaration
 timestamp=$(date +"%Y%m%d")
-LAST_PRG_USED=0 #if is the first run
-MIN=5 #to do -> cambiare in seguito per get PRG from .txt
-MAX=$(expr $MIN + $n - 1)
 OUT_DIR="params_gen_OUT_DIR"
 params_gen_FILE="params_generated.xml"
 
@@ -117,36 +114,36 @@ fi
 if ! [ -f "$path_OUT_dir/$params_gen_FILE" ] ; then
         touch "$path_OUT_dir/$params_gen_FILE"
         chmod 0777 "$path_OUT_dir/$params_gen_FILE"
+        last_PRG_value=0 #if it's the first run
 	else
-
-        last_PRG="$(grep 'LAST_PRG_USED:' "$path_OUT_dir/$params_gen_FILE")"
-        echo $last_PRG
-
-        echo "file '$params_gen_FILE' found, the last prg used is x"
+        # get LAST PRG USED before tabula rasa
+        line_last_PRG="$(grep 'LAST_PRG_USED:' "$path_OUT_dir/$params_gen_FILE")"
+        last_PRG_value=${line_last_PRG#*:}
+        echo "file '$params_gen_FILE' found, the last prg used is $last_PRG_value"
         echo
 	fi
 
-
-# tabula rasa of params_generated.txt
+# tabula rasa of params_generated.xml
 echo > "$path_OUT_dir/$params_gen_FILE"
 
 
-
-
-
+MIN=$(expr $last_PRG_value + 1)
+MAX=$(expr $MIN + $n - 1)
 list_PRG=( $(seq $MIN $MAX) )
 
 elab_time=$(date +"%Y-%m-%d %H:%M:%S")
 
-echo "EXECUTION_TIME : $elab_time"
-echo -e "SCRIPT_EXECUTION_TIME: $elab_time\n" >> "$path_OUT_dir/$params_gen_FILE"
-echo
+echo -e "script_execution_time: $elab_time \n"
+echo -e "using PRG from $MIN to $MAX \n"
+
+echo -e "SCRIPT_EXECUTION_TIME: $elab_time \n" >> "$path_OUT_dir/$params_gen_FILE"
+echo -e "using PRG from $MIN to $MAX \n" >> "$path_OUT_dir/$params_gen_FILE"
+
 
 for ((i=0; i<n; i++)) 
 do
 
-echo " --- tripla PAN-TARGA-HEX n° $(expr $i + 1) ---"
-echo
+echo -e " --- PAN-TARGA-HEX triple n° $(expr $i + 1) --- OK \n"
 
 PRG=${list_PRG[i]}
 
@@ -154,12 +151,11 @@ PAN=$(generate_PAN $PRG)
 PLATE=$(generate_PLATE $PRG $plate_f $plate_l)
 HEX_PLATE=$(convert_PLATE_to_HEX $PLATE)
 
-echo "$PAN - $PLATE - $HEX_PLATE"
-echo -e "$(expr $i + 1))$PAN - $PLATE - $HEX_PLATE \n" >> "$path_OUT_dir/$params_gen_FILE"
+#echo "$PAN - $PLATE - $HEX_PLATE"
+echo -e "$(expr $i + 1)) $PAN - $PLATE - $HEX_PLATE \n" >> "$path_OUT_dir/$params_gen_FILE"
 
-echo
 done
 
-last_PRG_used=$i
+echo -e "triple generation COMPLETED, check the file '$params_gen_FILE' at path: '$path_OUT_dir/$params_gen_FILE' \n"
 echo "LAST_PRG_USED: $PRG" >> "$path_OUT_dir/$params_gen_FILE"
 echo
