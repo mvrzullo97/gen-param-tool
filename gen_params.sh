@@ -1,5 +1,4 @@
 #!/bin/bash
-
 # PATTERN PAN = <date>...<prg> + F
 # PATTERN TARGA = AZ<prg>AZ
 
@@ -69,58 +68,59 @@ done
 
 # check plate chars
 if [[ "${plate_f}" =~ [^A-Z] ]] ; then
-    echo "Param error: invalid first two chars of plate, use only [A-Z]"
-    echo
+    echo -e "Param error: invalid first two chars of plate, use only [A-Z] \n"
 	exit 0
 fi
 
 if [[ "${plate_l}" =~ [^A-Z] ]] ; then
-    echo "Param error: invalid last two chars of plate, use only [A-Z]"
-    echo
+    echo -e "Param error: invalid last two chars of plate, use only [A-Z] \n"
 	exit 0
 fi
 
 # check plate's length
 if [[ ${#plate_f} != 2 ]]; 
 then
-        echo "Param error: invalid plate format (only two first chars, ex. AB)"
+        echo -e "Param error: invalid plate format (only two first chars, ex. AB) \n"
         echo
 	exit 0
 fi
 
 if [[ ${#plate_l} != 2 ]]; 
 then
-        echo "Param error: invalid plate format (only two first chars, ex. AB)"
+        echo -e "Param error: invalid plate format (only two first chars, ex. AB) \n"
         echo
 	exit 0
 fi
 
 # vars delcaration
 timestamp=$(date +"%Y%m%d")
-OUT_DIR="params_gen_OUT_DIR"
-params_gen_FILE="params_generated.xml"
+OUT_DIR="OUT_DIR"
+params_gen_FILE="params_gen.xml"
 
 # create OUT_DIR if not exist
 if ! [ -d $OUT_DIR ] ; then
 	mkdir $OUT_DIR
-	path_dir=$(realpath $OUT_DIR)
+	path_OUT_dir=$(realpath $OUT_DIR)
+    echo -e "create '$OUT_DIR' at path: '$path_OUT_dir' \n"
+    chmod 0777 "$path_OUT_dir"
 else
 	path_OUT_dir=$(realpath $OUT_DIR)
 fi
 
-
-
 # get LAST_PRG_USED
 if ! [ -f "$path_OUT_dir/$params_gen_FILE" ] ; then
+
         touch "$path_OUT_dir/$params_gen_FILE"
         chmod 0777 "$path_OUT_dir/$params_gen_FILE"
         last_PRG_value=0 #if it's the first run
+
 	else
+        
         # get LAST PRG USED before tabula rasa
         line_last_PRG="$(grep 'LAST_PRG_USED:' "$path_OUT_dir/$params_gen_FILE")"
         last_PRG_value=${line_last_PRG#*:}
-        echo "file '$params_gen_FILE' found, the last prg used is $last_PRG_value"
-        echo
+        echo -e "file '$params_gen_FILE' found, the last prg used is $last_PRG_value \n"
+
 	fi
 
 # tabula rasa of params_generated.xml
