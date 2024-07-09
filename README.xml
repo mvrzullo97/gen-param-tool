@@ -12,4 +12,4 @@ Lanciato il comando lo script crea,se non esiste, una cartella di destinazione O
 	PAN: YYYYMMDD...<prg>
 	TARGA: MA<prg>RZ
 
-A fine ciclo, scrive su file il tempo di esecuzione dello script (formato date classico) e l'ultimo PRG utilizzato in maniera tale da partire da quel valore in caso di un secondo lancio. Se il current date != dal date dello script, allora il PRG ripartirà da zero. Se si sceglie di far partire il numero targa da un valore a piacere, lo script non prende in considerazione l'ultimo PRG utilizzato.
+A fine ciclo, scrive su file il tempo di esecuzione dello script (formato date classico) e l'ultimo PRG utilizzato in maniera tale da partire da quel valore in caso di un secondo lancio. Se il current date è diverso dal date dello script, allora il PRG ripartirà da zero. Se si sceglie di far partire il numero targa da un valore a piacere, lo script non prende in considerazione l'ultimo PRG utilizzato.
